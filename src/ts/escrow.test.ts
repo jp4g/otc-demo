@@ -149,34 +149,34 @@ describe("OTC Escrow Test", () => {
   //     await pxe2.registerSender(alice.getAddress());
   //   });
 
-  xit("Test escrow sharing", async () => {
-    // Note for alice
-    let aliceEscrowDefinition = await escrow
-      .withWallet(alice)
-      .methods.get_escrow_definition()
-      .simulate();
-    console.log("Escrow definition found for Alice:", aliceEscrowDefinition);
+  //   it("Test escrow sharing", async () => {
+  //     // Note for alice
+  //     let aliceEscrowDefinition = await escrow
+  //       .withWallet(alice)
+  //       .methods.get_escrow_definition()
+  //       .simulate();
+  //     console.log("Escrow definition found for Alice:", aliceEscrowDefinition);
 
-    // check if maker note exists
-    let bobEscrowDefinition;
-    try {
-      bobEscrowDefinition = await escrow
-        .withWallet(bob)
-        .methods.get_escrow_definition()
-        .simulate();
-    } catch (error) {
-      console.log("No escrow definition note found for Bob, as expected.");
-    }
+  //     // check if maker note exists
+  //     let bobEscrowDefinition;
+  //     try {
+  //       bobEscrowDefinition = await escrow
+  //         .withWallet(bob)
+  //         .methods.get_escrow_definition()
+  //         .simulate();
+  //     } catch (error) {
+  //       console.log("No escrow definition note found for Bob, as expected.");
+  //     }
 
-    // add account to bob pxe
-    await pxe2.registerAccount(escrowKey, await escrow.partialAddress);
-    await escrow.withWallet(bob).methods.sync_private_state().simulate();
-    bobEscrowDefinition = await escrow
-      .withWallet(bob)
-      .methods.get_escrow_definition()
-      .simulate();
-    console.log("Escrow definition found for Bob:", bobEscrowDefinition);
-  });
+  //     // add account to bob pxe
+  //     await pxe2.registerAccount(escrowKey, await escrow.partialAddress);
+  //     await escrow.withWallet(bob).methods.sync_private_state().simulate();
+  //     bobEscrowDefinition = await escrow
+  //       .withWallet(bob)
+  //       .methods.get_escrow_definition()
+  //       .simulate();
+  //     console.log("Escrow definition found for Bob:", bobEscrowDefinition);
+  //   });
 
   it("Test deposit step", async () => {
     const aliceAmountBefore = await tokenA.methods
@@ -190,7 +190,7 @@ describe("OTC Escrow Test", () => {
 
     // Deposit tokens into the escrow
     let amount = new Fr(wad(4000n, 6n));
-    let nonce = Fr.random();
+    let nonce = Fr.ZERO;
     console.log("amount: ", amount, ", bigint: ", amount.toBigInt());
     console.log("nonce: ", nonce, ", bigint: ", nonce.toBigInt());
     await depositTokens(alice, escrow, tokenA, amount, nonce);

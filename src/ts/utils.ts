@@ -111,29 +111,22 @@ export async function depositTokens(
   nonce: Fr,
 ): Promise<void> {
   // create authwit
-  console.log(
-    "action args: ",
-    caller.getAddress(),
-    escrow.address,
-    amount.toBigInt(),
-    nonce,
-  );
-  const action = token.methods.transfer_private_to_private(
-    caller.getAddress(),
-    escrow.address,
-    amount.toBigInt(),
-    nonce,
-  );
-  console.log("Action: ", action);
-  const intent: IntentAction = { caller: escrow.address, action };
-  console.log("Intent: ", intent);
-  const authwit = await caller.createAuthWit(intent);
-  console.log("authwit: ", authwit);
+  const authwit = await caller.createAuthWit({
+    caller: escrow.address,
+    action: token.methods.transfer_private_to_private(
+      caller.getAddress(),
+      escrow.address,
+      amount.toBigInt(),
+      nonce,
+    ),
+  });
 
   // build the deposit transaction
-  await escrow.methods
-    .deposit(nonce)
-    .send({ authWitnesses: [authwit] })
+  await escrow
+    .withWallet(caller)
+    .methods.deposit(nonce)
+    .with({ authWitnesses: [authwit] })
+    .send()
     .wait();
 }
 

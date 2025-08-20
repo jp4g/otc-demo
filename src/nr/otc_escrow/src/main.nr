@@ -7,9 +7,8 @@ pub mod types;
 pub contract OTCEscrow {
     // aztec library imports
     use crate::types::{
-        escrow_definition_note::EscrowDefinitionNote,
+        escrow_definition_note::EscrowDefinitionNote, escrow_state_note::EscrowStateNote,
         maker_note::MakerNote,
-        escrow_state_note::EscrowStateNote
     };
     use aztec::{
         context::PrivateContext,
@@ -20,7 +19,7 @@ pub contract OTCEscrow {
         },
         messages::logs::note::encode_and_encrypt_note,
         note::{constants::MAX_NOTES_PER_PAGE, note_viewer_options::NoteViewerOptions},
-        prelude::{AztecAddress, PrivateImmutable, PrivateSet, PrivateMutable},
+        prelude::{AztecAddress, PrivateImmutable, PrivateMutable, PrivateSet},
         protocol_types::traits::Hash,
     };
 
@@ -32,7 +31,7 @@ pub contract OTCEscrow {
     struct Storage<Context> {
         definition: PrivateImmutable<EscrowDefinitionNote, Context>,
         maker_secret: PrivateImmutable<MakerNote, Context>,
-        escrow_state: PrivateMutable<EscrowStateNote, Context>
+        escrow_state: PrivateMutable<EscrowStateNote, Context>,
     }
 
     /// @dev Initialize the contract
@@ -94,12 +93,14 @@ pub contract OTCEscrow {
 
         // 3. initialize a token transfer into the contract
         let self_address = context.this_address();
-        Token::at(definition.maker_token_address).transfer_private_to_private(
-            context.msg_sender(),
-            self_address,
-            definition.maker_token_amount,
-            _nonce
-        ).call(&mut context);
+        Token::at(definition.maker_token_address)
+            .transfer_private_to_private(
+                context.msg_sender(),
+                self_address,
+                definition.maker_token_amount,
+                _nonce,
+            )
+            .call(&mut context);
 
         // 4, update escrow state
         escrow_state.advance_state();
