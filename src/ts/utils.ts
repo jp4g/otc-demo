@@ -9,6 +9,8 @@ import {
   Fr,
   deriveKeys,
   DeployOptions,
+  AuthWitness,
+  IntentAction,
 } from "@aztec/aztec.js";
 import {
   OTCEscrowContract,
@@ -16,6 +18,8 @@ import {
 } from "../artifacts/OTCEscrow.js";
 import { computePartialAddress } from "@aztec/stdlib/contract";
 import { TokenContract, TokenContractArtifact } from "../artifacts/Token.js";
+import { send } from "process";
+import { computeAddress } from "@aztec/stdlib/keys";
 
 export const TOKEN_METADATA = {
   usdc: {
@@ -30,8 +34,8 @@ export const TOKEN_METADATA = {
   },
 };
 
-export const wad = (n: number = 1, decimals: number = 18) =>
-  BigInt(n) * 10n ** BigInt(decimals);
+export const wad = (n: bigint = 1n, decimals: bigint = 18n) =>
+  n * 10n ** decimals;
 
 export const createPXE = async (id: number = 0): Promise<PXE> => {
   const { BASE_PXE_URL = `http://localhost` } = process.env;
@@ -60,10 +64,9 @@ export async function deployEscrowContract(
   deployer: AccountWallet,
   decryptionServiceAddress: AztecAddress,
   makerTokenAddress: AztecAddress,
-  makerTokenAmount: FieldLike,
+  makerTokenAmount: Fr,
   takerTokenAddress: AztecAddress,
-  takerTokenAmount: FieldLike,
-  nonce: FieldLike = Fr.ZERO,
+  takerTokenAmount: Fr,
 ): Promise<{ contract: OTCEscrowContract; secretKey: Fr }> {
   // generate keys for the escrow contract
   const escrowSecretKey = Fr.random();
@@ -80,18 +83,15 @@ export async function deployEscrowContract(
       makerTokenAmount,
       takerTokenAddress,
       takerTokenAmount,
-      nonce,
     ],
   );
+
   const partialAddress = await computePartialAddress(
     await contractDeployment.getInstance(),
   );
-  // console.log("partial address 1: ", partialAddress.toString(), "|| secret key: ", escrowSecretKey.toString());
-  let foundAddress1 = await pxe.registerAccount(
-    escrowSecretKey,
-    partialAddress,
-  );
-  // console.log("Found address 1: ", foundAddress1.address.toString());
+
+  await pxe.registerAccount(escrowSecretKey, partialAddress);
+
   const contract = await contractDeployment.send().deployed();
 
   console.log("Escrow contract deployed at:", contract.address.toString());
@@ -101,6 +101,40 @@ export async function deployEscrowContract(
     contract: contract as OTCEscrowContract,
     secretKey: escrowSecretKey,
   };
+}
+
+export async function depositTokens(
+  caller: AccountWallet,
+  escrow: OTCEscrowContract,
+  token: TokenContract,
+  amount: Fr,
+  nonce: Fr,
+): Promise<void> {
+  // create authwit
+  console.log(
+    "action args: ",
+    caller.getAddress(),
+    escrow.address,
+    amount.toBigInt(),
+    nonce,
+  );
+  const action = token.methods.transfer_private_to_private(
+    caller.getAddress(),
+    escrow.address,
+    amount.toBigInt(),
+    nonce,
+  );
+  console.log("Action: ", action);
+  const intent: IntentAction = { caller: escrow.address, action };
+  console.log("Intent: ", intent);
+  const authwit = await caller.createAuthWit(intent);
+  console.log("authwit: ", authwit);
+
+  // build the deposit transaction
+  await escrow.methods
+    .deposit(nonce)
+    .send({ authWitnesses: [authwit] })
+    .wait();
 }
 
 export async function deployTokenContract(

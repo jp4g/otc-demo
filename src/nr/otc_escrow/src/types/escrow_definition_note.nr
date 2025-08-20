@@ -2,9 +2,7 @@ use aztec::{
     macros::notes::note,
     oracle::random::random,
     prelude::AztecAddress,
-    protocol_types::{
-        traits::{Deserialize, Serialize},
-    },
+    protocol_types::traits::{Deserialize, Serialize},
 };
 
 // Defines all of the key values needed to execute an escrow transaction
@@ -22,9 +20,8 @@ pub struct EscrowDefinitionNote {
     // address of the token that the maker is trying to buy
     taker_token_address: AztecAddress,
     // amount of the taker_token that the maker is trying to buy
-    taker_token_amount: u128
+    taker_token_amount: u128,
 }
-
 
 impl EscrowDefinitionNote {
     pub fn new(
@@ -33,15 +30,15 @@ impl EscrowDefinitionNote {
         maker_token_address: AztecAddress,
         maker_token_amount: u128,
         taker_token_address: AztecAddress,
-        taker_token_amount: u128
+        taker_token_amount: u128,
     ) -> Self {
-        EscrowDefinitionNote { 
+        EscrowDefinitionNote {
             owner,
             maker_commitment,
             maker_token_address,
             maker_token_amount,
             taker_token_address,
-            taker_token_amount
+            taker_token_amount,
         }
     }
 }

@@ -543,6 +543,11 @@
     tsx "^4.19.4"
     typescript "^5.8.3"
 
+"@defi-wonderland/aztec-standards@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@defi-wonderland/aztec-standards/-/aztec-standards-1.2.1.tgz#7c22d0c7dc97542e6e7f35268bc561b520280219"
+  integrity sha512-EAhY2tM3NK9y83ZhJ5+5L0VhldLlbQoMBFczNJkarjE45eOTb5Ag16dsIRjfQruTvRg0WVU+ikZ0n5QERKbQKQ==
+
 "@esbuild/aix-ppc64@0.23.1":
   version "0.23.1"
   resolved "https://registry.yarnpkg.com/@esbuild/aix-ppc64/-/aix-ppc64-0.23.1.tgz#51299374de171dbd80bb7d838e1cfce9af36f353"
