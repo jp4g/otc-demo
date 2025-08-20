@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "src/nr/otc_escrow",
+]
+
+[benchmark]
+otc_escrow = "benchmarks/otc_escrow.benchmark.ts"
