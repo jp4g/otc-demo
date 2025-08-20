@@ -25,7 +25,7 @@ pub contract OTCEscrow {
         },
     };
     use crate::types::{
-        escrow_definition::EscrowDefinition,
+        escrow_definition_note::EscrowDefinitionNote,
         maker_note::MakerNote,
     };
 
@@ -35,7 +35,7 @@ pub contract OTCEscrow {
     // @param counter A numerical value
     #[storage]
     struct Storage<Context> {
-        definition: PrivateImmutable<EscrowDefinition, Context>,
+        definition: PrivateImmutable<EscrowDefinitionNote, Context>,
         maker_secret: PrivateSet<MakerNote, Context>
     }
 
@@ -56,24 +56,25 @@ pub contract OTCEscrow {
         let maker_note = MakerNote::new(self_address);
         storage.maker_secret.insert(maker_note).emit(encode_and_encrypt_note(
             &mut context,
-            self_address,
-            self_address
+            context.msg_sender(),
+            context.msg_sender()
         ));
 
         // 2. create the escrow definition
         let commitment = maker_note.commitment_from_context(&mut context);
-        let escrow_definition = EscrowDefinition::new(
+        let escrow_definition_note = EscrowDefinitionNote::new(
+            self_address,
             commitment,
             maker_token_address,
             maker_token_amount,
             taker_token_address,
             taker_token_amount
         );
-        // storage.definition.initialize(escrow_definition).emit(encode_and_encrypt_note(
-        //     &mut context,
-        //     self_address,
-        //     self_address
-        // ));
+        storage.definition.initialize(escrow_definition_note).emit(encode_and_encrypt_note(
+            &mut context,
+            self_address,
+            self_address
+        ));
 
         // // 3. deposit tokens into the escrow
         // Token::at(maker_token_address).transfer_private_to_private(
@@ -97,6 +98,11 @@ pub contract OTCEscrow {
     #[utility]
     pub unconstrained fn view_maker_note() -> BoundedVec<MakerNote, MAX_NOTES_PER_PAGE> {
         storage.maker_secret.view_notes(NoteViewerOptions::new())
+    }
+
+    #[utility]
+    pub unconstrained fn get_escrow_definition() -> EscrowDefinitionNote {
+        storage.definition.view_note()
     }
 
     // #[private]

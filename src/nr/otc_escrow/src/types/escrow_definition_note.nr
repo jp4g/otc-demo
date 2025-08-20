@@ -1,4 +1,4 @@
-use dep::aztec::{
+use aztec::{
     macros::notes::note,
     oracle::random::random,
     prelude::AztecAddress,
@@ -8,8 +8,10 @@ use dep::aztec::{
 };
 
 // Defines all of the key values needed to execute an escrow transaction
+#[note]
 #[derive(Eq, Serialize, Deserialize)]
-pub struct EscrowDefinition {
+pub struct EscrowDefinitionNote {
+    owner: AztecAddress,
     // private commitment to the maker of the escrow
     // also creates entropy that hides the note
     maker_commitment: Field,
@@ -24,14 +26,22 @@ pub struct EscrowDefinition {
 }
 
 
-impl EscrowDefinition {
+impl EscrowDefinitionNote {
     pub fn new(
+        owner: AztecAddress,
         maker_commitment: Field,
         maker_token_address: AztecAddress,
         maker_token_amount: Field,
         taker_token_address: AztecAddress,
         taker_token_amount: Field
     ) -> Self {
-        EscrowDefinition { maker_commitment, maker_token_address, maker_token_amount, taker_token_address, taker_token_amount }
+        EscrowDefinitionNote { 
+            owner,
+            maker_commitment,
+            maker_token_address,
+            maker_token_amount,
+            taker_token_address,
+            taker_token_amount
+        }
     }
 }

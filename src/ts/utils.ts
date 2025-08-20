@@ -42,6 +42,7 @@ export async function deployEscrowContract(
     makerTokenAmount: FieldLike,
     takerTokenAddress: AztecAddress,
     takerTokenAmount: FieldLike,
+    nonce: FieldLike = Fr.ZERO
 ): Promise<{ contract: OTCEscrowContract, secretKey: Fr }> {
     // generate keys for the escrow contract
     const escrowSecretKey = Fr.random();
@@ -58,6 +59,7 @@ export async function deployEscrowContract(
             makerTokenAmount,
             takerTokenAddress,
             takerTokenAmount,
+            nonce
         ],
     );
     const partialAddress = await computePartialAddress(await contractDeployment.getInstance());

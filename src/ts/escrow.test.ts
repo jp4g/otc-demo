@@ -76,40 +76,23 @@ describe("Counter Contract", () => {
     });
 
     it("e2e", async () => {
-        // await escrow.withWallet(alice).methods.sync_private_state().simulate();
-        // const keys = escrow.withWallet(alice).instance.publicKeys;
-        // const x = await escrow.withWallet(alice).methods.leak_keys().simulate();
 
-        // console.log("x", x);
-        // const x2 = await escrow.withWallet(alice).methods.leak_keys_2().simulate();
-        // console.log("x2", x2);
-        // const y = await escrow.withWallet(bob).methods.leak_keys();
-        // console.log("y", y);
-
-        // check no note exists
-        let aliceMakerNote = await escrow.withWallet(alice).methods.view_maker_note().simulate();
-        console.log("aliceMakerNote before", aliceMakerNote);
-
+        // Note for alice
+        let aliceEscrowDefinition = await escrow.withWallet(alice).methods.get_escrow_definition().simulate();
+        console.log("Escrow definition found for Alice:", aliceEscrowDefinition);
 
         // check if maker note exists
-        let doesExist = await escrow.withWallet(bob).methods.view_maker_note().simulate();
-        console.log("doesExistBefore", doesExist);
-        // let makerNote = await escrow.withWallet(bob).methods.view_maker_note().simulate();
-        // console.log("makerNote before", makerNote);
-
+        let bobEscrowDefinition;
+        try {
+            bobEscrowDefinition = await escrow.withWallet(bob).methods.get_escrow_definition().simulate();
+        } catch (error) {
+            console.log("No escrow definition note found for Bob, as expected.");
+        }
+        
         // add account to bob pxe
-        // console.log("PXE2 registered accounts before adding", (await pxe2.getRegisteredAccounts()))
-        // console.log("partial address 2: ", await escrow.partialAddress, "|| secret key: ", escrowKey);
-
-        let foundAddress2 = await pxe2.registerAccount(escrowKey, await escrow.partialAddress);
-        // console.log("Found address 2: ", foundAddress2.address.toString());
-        // console.log("PXE1 registered accounts", (await pxe1.getRegisteredAccounts()))
-        // console.log("PXE2 registered accounts", (await pxe2.getRegisteredAccounts()))
-        // console.log("Escrow address: ", escrow.address.toString());
+        await pxe2.registerAccount(escrowKey, await escrow.partialAddress);
         await escrow.withWallet(bob).methods.sync_private_state().simulate()
-        doesExist = await escrow.withWallet(bob).methods.view_maker_note().simulate();
-        console.log("doesExistAfter", doesExist);
-        // makerNote = await escrow.methods.view_maker_not().simulate();
-        // console.log("makerNote after", makerNote);
+        bobEscrowDefinition = await escrow.withWallet(bob).methods.get_escrow_definition().simulate();
+        console.log("Escrow definition found for Bob:", bobEscrowDefinition);
     });
 });
