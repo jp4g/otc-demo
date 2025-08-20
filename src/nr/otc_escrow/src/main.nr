@@ -29,7 +29,7 @@ pub contract OTCEscrow {
         maker_note::MakerNote,
     };
 
-    // use token_contract::Token;
+    use token_contract::Token;
 
     // @param owner The address of the owner
     // @param counter A numerical value
@@ -46,9 +46,9 @@ pub contract OTCEscrow {
     fn constructor(
         decryption_service: AztecAddress,
         maker_token_address: AztecAddress,
-        maker_token_amount: Field,
+        maker_token_amount: u128,
         taker_token_address: AztecAddress,
-        taker_token_amount: Field,
+        taker_token_amount: u128,
         _nonce: Field
     ) {
         // 1. create the maker secret/ commitment
@@ -76,23 +76,14 @@ pub contract OTCEscrow {
             self_address
         ));
 
-        // // 3. deposit tokens into the escrow
-        // Token::at(maker_token_address).transfer_private_to_private(
-        //     context.msg_sender(),
-        //     self_address,
-        //     maker_token_amount,
-        //     _nonce
-        // ).call(&mut context);
+        // 3. deposit tokens into the escrow
+        Token::at(maker_token_address).transfer_private_to_private(
+            context.msg_sender(),
+            self_address,
+            maker_token_amount,
+            _nonce
+        ).call(&mut context);
 
-    }
-
-    #[private]
-    #[view]
-    pub fn leak_keys() -> Field {
-        // 2. log the decryption keys to the relevant parties
-        let decryption_keys = get_public_keys(context.this_address());
-        let nsk = context.request_nsk_app(decryption_keys.npk_m.hash());
-        nsk
     }
 
     #[utility]
@@ -104,47 +95,4 @@ pub contract OTCEscrow {
     pub unconstrained fn get_escrow_definition() -> EscrowDefinitionNote {
         storage.definition.view_note()
     }
-
-    // #[private]
-    // #[view]
-    // pub fn leak_keys_2() -> [Field; 2] {
-    //     // 2. log the decryption keys to the relevant parties
-    //     let decryption_keys = get_public_keys(context.this_address());
-    //     let nsk = context.request_nsk_app(decryption_keys.npk_m.hash());
-    //     let ovsk = context.request_ovsk_app(decryption_keys.ovpk_m.hash());
-    //     [nsk, ovsk]
-    // }
-
-    // /// @dev Retrieves the owner of the contract
-    // /// @return The owner of the contract
-    // #[public]
-    // fn get_owner() -> AztecAddress {
-    //     storage.owner.read()
-    // }
-
-    // /// @dev Increments the counter
-    // #[private]
-    // fn increment() {
-    //     Counter::at(context.this_address()).increment_internal().enqueue(&mut context);
-    // }
-
-    // /// @dev Retrieves the counter value
-    // /// @return The current counter value
-    // #[public]
-    // fn get_counter() -> u128 {
-    //     storage.counter.read()
-    // }
-
-    // #[contract_library_method]
-    // fn _only_maker(context: &mut PrivateContext) {
-
-    // }
-
-    // /// @dev Increments the counter
-    // #[public]
-    // #[internal]
-    // fn increment_internal() {
-    //     let current_value = storage.counter.read();
-    //     storage.counter.write(current_value + 1);
-    // }
 }

@@ -14,7 +14,8 @@
     "test:nr": "aztec test",
     "lint:prettier": "prettier '**/*.{js,ts}' --write",
     "build": "yarn compile && yarn codegen -f",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "./scripts/postinstall.sh"
   },
   "lint-staged": {
     "*.ts": "prettier --write -u"

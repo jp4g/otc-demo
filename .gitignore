@@ -7,3 +7,6 @@ log/
 codegenCache.json
 .env
 .cursor
+
+aztec-standards/
+token_contract/

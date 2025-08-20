@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "src/nr/otc_escrow",
+    "src/nr/token_contract"
 ]
 
 [benchmark]

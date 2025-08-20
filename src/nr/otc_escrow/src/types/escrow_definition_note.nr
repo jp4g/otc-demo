@@ -18,11 +18,11 @@ pub struct EscrowDefinitionNote {
     // address of the token that the maker is offering to sell
     maker_token_address: AztecAddress,
     // amount of the maker_token that the maker is offering to sell
-    maker_token_amount: Field,
+    maker_token_amount: u128,
     // address of the token that the maker is trying to buy
     taker_token_address: AztecAddress,
     // amount of the taker_token that the maker is trying to buy
-    taker_token_amount: Field
+    taker_token_amount: u128
 }
 
 
@@ -31,9 +31,9 @@ impl EscrowDefinitionNote {
         owner: AztecAddress,
         maker_commitment: Field,
         maker_token_address: AztecAddress,
-        maker_token_amount: Field,
+        maker_token_amount: u128,
         taker_token_address: AztecAddress,
-        taker_token_amount: Field
+        taker_token_amount: u128
     ) -> Self {
         EscrowDefinitionNote { 
             owner,
