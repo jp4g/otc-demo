@@ -29,3 +29,7 @@ fi
 ## 2. Grab the token contract
 cp -r src/token_contract $SCRIPT_DIR/../src/nr
 echo "Installed defi-wonderland:token_contract:$VERSION locally"
+
+## 3. Remove aztec-standards
+cd ..
+rm -rf aztec-standards
