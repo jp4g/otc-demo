@@ -19,6 +19,8 @@ impl EscrowStateNote {
         EscrowStateNote { owner, state: 1, randomness: unsafe { random() } }
     }
 
+    // todo: change to 1 function with enum param check
+
     pub fn assert_initialized(self) {
         assert(self.state != 0)
     }
