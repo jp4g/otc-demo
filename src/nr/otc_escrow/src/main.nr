@@ -7,8 +7,7 @@ pub mod types;
 pub contract OTCEscrow {
     // aztec library imports
     use crate::types::{
-        escrow_definition_note::EscrowDefinitionNote,
-        escrow_state_note::EscrowStateNote,
+        escrow_definition_note::EscrowDefinitionNote, escrow_state_note::EscrowStateNote,
         maker_note::MakerNote,
     };
     use aztec::{
@@ -16,9 +15,9 @@ pub contract OTCEscrow {
         event::event_interface::{emit_event_in_private_log, PrivateLogContent},
         keys::{constants::INCOMING_INDEX, getters::get_public_keys},
         macros::{
+            events::event,
             functions::{initializer, internal, private, public, utility, view},
             storage::storage,
-            events::event
         },
         messages::logs::note::encode_and_encrypt_note,
         note::{constants::MAX_NOTES_PER_PAGE, note_viewer_options::NoteViewerOptions},
@@ -31,7 +30,7 @@ pub contract OTCEscrow {
     #[derive(Serialize)]
     #[event]
     struct ClaimAvailable {
-        address: AztecAddress
+        address: AztecAddress,
     }
 
     #[storage]
@@ -109,7 +108,9 @@ pub contract OTCEscrow {
      * @param _nonce - the AuthWit nonce used to authorize transfer_private_to_private
      */
     #[private]
-    pub fn deposit(_nonce: Field) {
+    pub fn deposit(
+        _nonce: Field
+    ) {
         // 1. check that the user can recreate the commitment
         let definition = storage.definition.get_note();
         let maker_secret = storage.maker_secret.get_note();
@@ -130,6 +131,15 @@ pub contract OTCEscrow {
                 _nonce,
             )
             .call(&mut context);
+
+        // Token::at(token_address)
+        //     .transfer_private_to_private(
+        //         context.msg_sender(),
+        //         recipient_address,
+        //         amount,
+        //         _nonce,
+        //     )
+        //     .call(&mut context);
 
         // 4, update escrow state
         escrow_state.advance_state();
@@ -162,7 +172,7 @@ pub contract OTCEscrow {
                 _nonce,
             )
             .call(&mut context);
-        
+
         // 3. transfer maker_tokens from the escrow to the caller
         Token::at(definition.maker_token_address)
             .transfer_private_to_private(
@@ -223,6 +233,22 @@ pub contract OTCEscrow {
             self_address,
             self_address,
         ));
+    }
+
+    #[private]
+    pub fn dummy_transfer_out(
+        token_address: AztecAddress,
+        token_amount: u128,
+        recipient: AztecAddress
+    ) {
+        Token::at(token_address)
+            .transfer_private_to_private(
+                context.this_address(),
+                recipient,
+                token_amount,
+                0,
+            )
+            .call(&mut context);
     }
 
     #[utility]

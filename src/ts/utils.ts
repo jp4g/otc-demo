@@ -103,32 +103,33 @@ export async function deployEscrowContract(
   };
 }
 
-export async function depositTokens(
-  caller: AccountWallet,
-  escrow: OTCEscrowContract,
-  token: TokenContract,
-  amount: Fr,
-  nonce: Fr,
-): Promise<void> {
-  // create authwit
-  const authwit = await caller.createAuthWit({
-    caller: escrow.address,
-    action: token.methods.transfer_private_to_private(
-      caller.getAddress(),
-      escrow.address,
-      amount.toBigInt(),
-      nonce,
-    ),
-  });
+// export async function depositTokens(
+//   caller: AccountWallet,
+//   escrow: OTCEscrowContract,
+//   token: TokenContract,
+//   amount: Fr,
+//   nonce: Fr,
+// ): Promise<void> {
+//   // create authwit
+//   const authwit = await caller.createAuthWit({
+//     caller: escrow.address,
+//     action: token.methods.transfer_private_to_private(
+//       caller.getAddress(),
+//       escrow.address,
+//       amount.toBigInt(),
+//       nonce,
+//     ),
+//   });
 
-  // build the deposit transaction
-  await escrow
-    .withWallet(caller)
-    .methods.deposit(nonce)
-    .with({ authWitnesses: [authwit] })
-    .send()
-    .wait();
-}
+//   // build the deposit transaction
+//   await escrow
+//     .withWallet(caller)
+//     .methods
+//     .deposit(nonce)
+//     .with({ authWitnesses: [authwit] })
+//     .send()
+//     .wait();
+// }
 
 export async function deployTokenContract(
   tokenMetadata: { name: string; symbol: string; decimals: number },
